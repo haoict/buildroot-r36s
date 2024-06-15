@@ -33,3 +33,14 @@ https://stackoverflow.com/questions/47320800/how-to-clean-only-target-in-buildro
 rm -rf output/target
 find output/ -name ".stamp_target_installed" -delete
 rm -f output/build/host-gcc-final-*/.stamp_host_installed
+
+## Docker
+```bash
+wget https://download.docker.com/linux/static/stable/aarch64/docker-26.1.4.tgz
+tar -xzvf docker-26.1.4.tgz
+cp docker/* /usr/bin/
+dockerd &
+docker run -p 8080:80 -d --name hello --rm nginxdemos/hello
+docker ps -a
+curl localhost:8080
+```

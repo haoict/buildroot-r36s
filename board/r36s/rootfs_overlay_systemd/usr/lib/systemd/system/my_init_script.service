@@ -3,7 +3,6 @@ Description=My Init Script
 
 [Service]
 ExecStart=/usr/local/bin/my_init_script.sh
-Type=simple
 
 [Install]
 WantedBy=multi-user.target
