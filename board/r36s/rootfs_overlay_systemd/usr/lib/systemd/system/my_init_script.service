@@ -1,8 +1,13 @@
 [Unit]
 Description=My Init Script
+#After=firstboot.service
 
 [Service]
+Type=simple
+#User=root
+WorkingDirectory=/root
 ExecStart=/usr/local/bin/my_init_script.sh
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

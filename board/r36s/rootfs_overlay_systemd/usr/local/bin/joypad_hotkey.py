@@ -2,8 +2,7 @@
 
 import evdev
 import asyncio
-import time
-from subprocess import check_output
+import subprocess
 
 arkos_joypad = evdev.InputDevice("/dev/input/event2")
 
@@ -29,7 +28,8 @@ class Joypad:
 
 def runcmd(cmd, *args, **kw):
     print(f">>> {cmd}")
-    check_output(cmd, *args, **kw)
+    #check_output(cmd, *args, **kw)
+    subprocess.run(cmd, *args, **kw)
 
 async def handle_event(device):
     # event.code is the button number
@@ -43,7 +43,19 @@ async def handle_event(device):
                     runcmd("/usr/local/bin/writevt.elf /dev/tty1 'root\n'", shell=True)
                     exit
                 if event.code == Joypad.start and event.value == 1:
-                    runcmd("/usr/local/bin/writevt.elf /dev/tty1 'ls -la\n'", shell=True)
+                    runcmd("killall emulationstation || killall retroarch || killall pico8_64 || killall 351Files || true\n'", shell=True)
+                    exit
+                if event.code == Joypad.up and event.value == 1:
+                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico8_64 -splore &\n'", shell=True)
+                    exit
+                if event.code == Joypad.left and event.value == 1:
+                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/retroarch &\n'", shell=True)
+                    exit
+                if event.code == Joypad.right and event.value == 1:
+                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/es/emulationstation &\n'", shell=True)
+                    exit
+                if event.code == Joypad.down and event.value == 1:
+                    runcmd("cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files &\n'", shell=True)
                     exit
 
 def run():
