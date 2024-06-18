@@ -40,23 +40,24 @@ async def handle_event(device):
             keys = arkos_joypad.active_keys()
             if Joypad.fn in keys:
                 if event.code == Joypad.select and event.value == 1:
-                    runcmd("/usr/local/bin/writevt.elf /dev/tty1 'root\n'", shell=True)
+                    runcmd("killall simple-launcher; cd /usr/local/bin && LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/simple-launcher &\n", shell=True)
                     exit
                 if event.code == Joypad.start and event.value == 1:
-                    runcmd("killall emulationstation || killall retroarch || killall pico8_64 || killall 351Files || true\n'", shell=True)
+                    runcmd("killall emulationstation; killall retroarch; killall pico8_64; killall 351Files; true\n", shell=True)
                     exit
                 if event.code == Joypad.up and event.value == 1:
-                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico8_64 -splore &\n'", shell=True)
+                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico-8/pico8_64 -splore &\n'", shell=True)
                     exit
-                if event.code == Joypad.left and event.value == 1:
-                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/retroarch &\n'", shell=True)
-                    exit
-                if event.code == Joypad.right and event.value == 1:
-                    runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/es/emulationstation &\n'", shell=True)
-                    exit
-                if event.code == Joypad.down and event.value == 1:
-                    runcmd("cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files &\n'", shell=True)
-                    exit
+                # if event.code == Joypad.left and event.value == 1:
+                #     runcmd("/usr/local/bin/writevt.elf /dev/tty1 'root\n'", shell=True)
+                #     runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/retroarch &\n'", shell=True)
+                #     exit
+                # if event.code == Joypad.right and event.value == 1:
+                #     runcmd("HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/es/emulationstation &\n'", shell=True)
+                #     exit
+                # if event.code == Joypad.down and event.value == 1:
+                #     runcmd("cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files &\n'", shell=True)
+                #     exit
 
 def run():
     asyncio.ensure_future(handle_event(arkos_joypad))

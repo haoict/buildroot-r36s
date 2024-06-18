@@ -1,0 +1,4 @@
+config BR2_PACKAGE_SIMPLE_LAUNCHER
+    bool "simple-launcher"
+    help
+      Simple Launcher program

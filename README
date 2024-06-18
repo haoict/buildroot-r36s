@@ -44,3 +44,74 @@ docker run -p 8080:80 -d --name hello --rm nginxdemos/hello
 docker ps -a
 curl localhost:8080
 ```
+
+
+
+
+
+
+
+
+
+
+
+mkdir -p /roms && mount -t exfat /dev/mmcblk0p3 /roms
+mkdir -p /mnt/rootfs && mount -t ext4 /dev/mmcblk0p2 /mnt/rootfs
+
+
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libfreeimage* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libvlc* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libGLES_CM* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libMali* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libmali-bifrost-g31-rxp0-wayland-gbm.so* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libSM* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libopenjp2* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libraw* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libtiff* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libwebp* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libH* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libI* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libway* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libbsd* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libxcb* /usr/local/lib/
+rsync -av /mnt/rootfs//usr/lib/aarch64-linux-gnu/libjpegxr.so.1.1 /usr/lib/aarch64-linux-gnu/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/liblcms* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libgo* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libzs* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libj* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libidn* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libff* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libX* /usr/local/lib/
+
+
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libav* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libsw* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libpng* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libvp* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/librs* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libca* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libz* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libsn* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libao* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libco* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libgsm* /usr/local/lib/
+
+
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libmp* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libop* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libsh* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libsp* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libt* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libvo* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libw* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libx* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libv* /usr/local/lib/
+rsync -av /mnt/rootfs/lib/aarch64-linux-gnu/libbz* /usr/local/lib/
+
+
+
+mkdir /usr/lib/aarch64-linux-gnu
+rsync -av /mnt/rootfs/usr/lib/aarch64-linux-gnu/libSDL* /usr/lib/aarch64-linux-gnu
+rsync -av /mnt/rootfs/usr/local/lib/aarch64-linux-gnu /usr/local/lib/
+
+LD_LIBRARY_PATH=/usr/local/lib/aarch64-linux-gnu:/usr/local/lib /roms/pico-8/pico8_64 -width 640 -height 480 -volume 50 -pixel_perfect 1 -windowed 1 -joystick 0 -home /roms/pico-8

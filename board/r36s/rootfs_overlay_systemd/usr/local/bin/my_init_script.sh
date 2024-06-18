@@ -7,6 +7,7 @@ modprobe dwc2
 
 mount -t vfat /dev/mmcblk0p1 /boot
 
+killall python3
 nohup /usr/bin/python3 /usr/local/bin/joypad_hotkey.py &
 nohup /usr/bin/python3 /usr/local/bin/power_hotkey.py &
 
