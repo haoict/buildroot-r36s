@@ -1,10 +1,13 @@
+My CFW
 Retroarch
 HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/retroarch/retroarch
 Pico-8
 HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico-8/pico8_64 -splore
 File Manager
 cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files
+Sleep
+systemctl suspend
 Reboot
-reboot -f
+systemctl reboot -f
 Poweroff
-poweroff -f
+systemctl poweroff

@@ -16,7 +16,7 @@ define SIMPLE_LAUNCHER_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/local/bin
     $(INSTALL) -D -m 0755 $(@D)/simple-launcher  $(TARGET_DIR)/usr/local/bin
     $(INSTALL) -D -m 0755 $(@D)/simple-launcher-commands.txt  $(TARGET_DIR)/usr/local/bin
-    $(INSTALL) -D -m 0755 $(@D)/Ubuntu-R.ttf  $(TARGET_DIR)/usr/local/bin
+    $(INSTALL) -D -m 0755 $(@D)/simple-launcher.ttf  $(TARGET_DIR)/usr/local/bin
 endef
 
 $(eval $(generic-package))
