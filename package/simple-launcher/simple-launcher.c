@@ -30,7 +30,7 @@ char brightness[8];
 char brightnessDisplayString[20] = "Brightness: 0%";
 char volume[8];
 char volumeDisplayString[20] = "Volume: 0%";
-char creditDisplayString[MAX_NAME_LENGTH] = "TiniLinux";
+char creditDisplayString[MAX_NAME_LENGTH] = "Buildroot (R36S)";
 
 void load_commands(const char *filename)
 {
@@ -127,7 +127,7 @@ void updateHwInfo()
 		strcpy(volumeDisplayString, "Volume: ");
 		strcat(volumeDisplayString, volume);
 	}
-	strcpy(creditDisplayString, "TiniLinux (R36S) | ");
+	strcpy(creditDisplayString, "Buildroot (R36S) | ");
 	strcat(creditDisplayString, brightnessDisplayString);
 	strcat(creditDisplayString, " | ");
 	strcat(creditDisplayString, volumeDisplayString);

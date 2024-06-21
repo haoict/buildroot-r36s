@@ -1,8 +1,8 @@
-My CFW
+Simple Launcher
 Retroarch
 HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/retroarch/retroarch
 Pico-8
-HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico-8/pico8_64 -splore
+HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico-8/pico8_64 -splore -home /roms/pico-8
 File Manager
 cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files
 Sleep

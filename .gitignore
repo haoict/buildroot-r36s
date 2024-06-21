@@ -13,3 +13,6 @@
 *.rej
 *~
 *.pyc
+
+board/r36s/rootfs_overlay_systemd/root/pico-8/pico8_64
+board/r36s/rootfs_overlay_systemd/root/pico-8/pico8.dat

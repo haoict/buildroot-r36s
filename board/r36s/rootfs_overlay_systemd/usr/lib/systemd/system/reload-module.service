@@ -1,0 +1,11 @@
+[Unit]
+Description=Reload module after suspend
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/modprobe -r dwc2
+ExecStartPost=/usr/sbin/modprobe dwc2
+
+[Install]
+WantedBy=suspend.target
