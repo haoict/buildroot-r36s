@@ -31,16 +31,7 @@ https://buildroot.org/manual.html#submitting-patches
 
 ## Install
 
-!WIP
-```bash
-sudo mount -t ext4 /dev/sdd4 /mnt/rootfs
-sudo rm -rf /mnt/rootfs/*
-sudo tar -xvf ~/projects/buildroot-r36s/output/images/rootfs.tar -C /mnt/rootfs && sync 
-sudo umount /dev/sdd4
-sudo eject /dev/sdd
-```
-
-# Make flashable img file
+### Make flashable img file
 
 First download the original ArkOS img file: https://github.com/AeolusUX/ArkOS-R3XS
 
@@ -61,45 +52,17 @@ Ref about parted command: https://raspberrypi.stackexchange.com/questions/78466/
 
 
 ```bash
-sudo -Es
+cd board/r36s
+sudo ./post-build.sh
+```
+### Update rootfs only
 
-# Create an empty img file
-truncate -s 1090M buildroot-r36s.img
-
-# Make the disk MBR type (msdos)
-parted buildroot-r36s.img mktable msdos
-
-# Copy u-boot data (skip the first sector because it is MBR data)
-dd if=arkos.img of=buildroot-r36s.img bs=512 skip=1 seek=1 count=32767 conv=notrunc
-
-# Making BOOT partitions (size 135168 sector - 32768 sector = 102400 sectors * 512 = 50MiB)
-parted buildroot-r36s.img mkpart primary fat32 32768s 135167s
-
-# Making rootfs partitions (size 1Gi)
-parted buildroot-r36s.img mkpart primary ext4 135168s 2232319s
-
-# Verify
-parted buildroot-r36s.img --script -- unit MiB print
-
-# Format partitions and mount
-losetup --show --find --partscan buildroot-r36s.img
-ls -la /dev/loop10*
-mkfs.fat -F32 -n BOOT /dev/loop10p1
-mkfs.ext4 -L rootfs /dev/loop10p2
-
-mkdir -p /mnt/BOOT && mount -t vfat /dev/loop10p1 /mnt/BOOT
-mkdir -p /mnt/rootfs && mount -t ext4 /dev/loop10p2 /mnt/rootfs
-
-# Copy the content of orignal ArkOS BOOT (Kernel, uInitrd, DTB, ...) to /mnt/BOOT
-tar -xvJf BOOT.tar.xz -C /mnt/BOOT --no-same-owner
-# Extract buildroot (output/images/rootfs.tar) to /mnt/rootfs
-tar -xvf rootfs.tar -C /mnt/rootfs --no-same-owner
-sync
-
-# Unmount and Detach the img
-umount /mnt/BOOT
-umount /mnt/rootfs
-losetup --detach-all
+```bash
+sudo mount -t ext4 /dev/sdd2 /mnt/rootfs
+sudo rm -rf /mnt/rootfs/*
+sudo tar -xvf ~/projects/buildroot-r36s/output/images/rootfs.tar -C /mnt/rootfs && sync 
+sudo umount /dev/sdd4
+sudo eject /dev/sdd
 ```
 
 ## Clean target build without rebuild all binaries and libraries
@@ -110,14 +73,8 @@ find output/ -name ".stamp_target_installed" -delete
 rm -f output/build/host-gcc-final-*/.stamp_host_installed
 ```
 
-
-## Mounts
-mkdir -p /roms && mount -t exfat /dev/mmcblk0p3 /roms
-mkdir -p /mnt/rootfs && mount -t ext4 /dev/mmcblk0p2 /mnt/rootfs
-
-
-
-## Docker
+## Appendix
+### Run Docker
 ```bash
 wget https://download.docker.com/linux/static/stable/aarch64/docker-26.1.4.tgz
 tar -xzvf docker-26.1.4.tgz
