@@ -21,10 +21,11 @@ TTF_Font *lFont;
 TTF_Font *xlFont;
 TTF_Font *titleFont;
 
-typedef struct {
+typedef struct Command Command;
+struct Command {
 	char name[MAX_NAME_LENGTH];
 	char command[MAX_COMMAND_LENGTH];
-} Command;
+};
 
 Command *commands = NULL;
 int numCommands = 0;
@@ -58,6 +59,9 @@ void loadCommands(const char *filename)
 		size_t len = strlen(line);
 		if (len > 0 && line[len - 1] == '\n') {
 			line[len - 1] = '\0';
+		}
+		if (line[0] == '\0') {
+			continue;
 		}
 
 		// Allocate or reallocate commands array
@@ -186,6 +190,8 @@ void updateRender(int selectedItem, SDL_Color color, SDL_Color highlightColor)
 void executeShellScript(const char *script)
 {
 	// Close SDL window
+	SDL_JoystickClose(joystick);
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
@@ -242,6 +248,7 @@ int main(int argc, char *argv[])
 
 	SDL_Event event;
 	int running = 1;
+	int suspend = 0;
 	int selectedItem = 0;
 
 	updateHwInfo();
@@ -290,6 +297,12 @@ int main(int argc, char *argv[])
 					updateHwInfo();
 					break;
 				case 102: // power
+					if (!suspend) {
+						system("systemctl suspend");
+						suspend = 1;
+					} else {
+						suspend = 0;
+					}
 					break;
 				}
 				break;
