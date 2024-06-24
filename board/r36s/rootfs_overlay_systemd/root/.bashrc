@@ -102,4 +102,4 @@ fi
 
 # FIXME: fix systemctl system mode. For now we have to run with --user
 # systemctl --user status sshd
-export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
+# export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket

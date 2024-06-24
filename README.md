@@ -61,16 +61,14 @@ sudo ./post-build.sh
 sudo mount -t ext4 /dev/sdd2 /mnt/rootfs
 sudo rm -rf /mnt/rootfs/*
 sudo tar -xvf ~/projects/buildroot-r36s/output/images/rootfs.tar -C /mnt/rootfs && sync 
-sudo umount /dev/sdd4
+sudo umount /dev/sdd2
 sudo eject /dev/sdd
 ```
 
 ## Clean target build without rebuild all binaries and libraries
 https://stackoverflow.com/questions/47320800/how-to-clean-only-target-in-buildroot
 ```bash
-rm -rf output/target
-find output/ -name ".stamp_target_installed" -delete
-rm -f output/build/host-gcc-final-*/.stamp_host_installed
+rm -rf output/target && find output/ -name ".stamp_target_installed" -delete && rm -f output/build/host-gcc-final-*/.stamp_host_installed
 ```
 
 ## Appendix

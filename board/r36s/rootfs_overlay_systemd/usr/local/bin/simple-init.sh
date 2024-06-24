@@ -6,6 +6,9 @@ fi
 
 echo 3 > /proc/sys/kernel/printk
 
+# Disable console blanking
+echo -ne "\033[9;0]" > /dev/tty1
+
 # sound setup
 amixer set "Playback Path" SPK_HP
 amixer set Playback 75%
