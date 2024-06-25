@@ -58,6 +58,8 @@ sudo ./post-build.sh
 ### Update rootfs only
 
 ```bash
+ls -la /dev/sd*
+
 sudo mount -t ext4 /dev/sdd2 /mnt/rootfs
 sudo rm -rf /mnt/rootfs/*
 sudo tar -xvf ~/projects/buildroot-r36s/output/images/rootfs.tar -C /mnt/rootfs && sync 
