@@ -1,0 +1,4 @@
+config BR2_PACKAGE_SDL12_COMPAT
+    bool "sdl12-compat"
+    depends on BR2_TOOLCHAIN_HAS_THREADS
+    select BR2_PACKAGE_SDL2

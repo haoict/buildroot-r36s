@@ -5,6 +5,8 @@ Pico-8
 HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/pico-8/pico8_64 -splore -home /roms/pico-8
 File Manager
 cd /root/351Files && HOME=/root LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files
+Simple Terminal
+HOME=/root LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/SimpleTerminal
 Quit launcher
 killall simple-launcher && echo "Press Fn + Select to restart Simple Launcher" >> /dev/tty1
 Sleep
