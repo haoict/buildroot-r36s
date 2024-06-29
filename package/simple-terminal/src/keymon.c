@@ -78,9 +78,9 @@ void open_gpio_keys_polled()
 				tmp = fd;
 				if (fd > 0 && ioctl(fd, EVIOCGNAME(128) /*0x80804506*/, v6) >= 0)
 				{
-#ifdef RG35XXPLUS
+#if defined(RG35XXPLUS)
 					if (!strcmp(v6, "Deeplay-keys") || !strcmp(v6, "ANBERNIC-keys"))
-#elif R36S || R36S_SDL12COMPAT
+#elif defined(R36S) || defined(R36S_SDL12COMPAT)
 					if (!strcmp(v6, "GO-Super Gamepad"))
 #endif
 					{
@@ -109,6 +109,7 @@ int input_var_17 = 0;
 
 void process_events(int ev_code, int ev_value)
 {
+	// printf("process_events: ev_code=%d, ev_value=%d\n", ev_code, ev_value);
 	int scancode = ev_code;
 	int sym = ev_code;
 
@@ -139,6 +140,13 @@ void process_events(int ev_code, int ev_value)
 			sym = RAW_RIGHT;
 		}
 	}
+#if defined(R36S) || defined(R36S_SDL12COMPAT)
+	// ignore joysticks
+	else if (ev_code == 0 || ev_code == 1 || ev_code == 3 || ev_code == 4)
+	{
+		return;
+	}
+#endif
 	else
 	{
 		// A/B/X/Y

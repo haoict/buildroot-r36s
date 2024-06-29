@@ -28,11 +28,8 @@
 
 #include "font.h"
 #include "keyboard.h"
-#include "msg_queue.h"
 
-#ifdef RG35XXPLUS
-#include "keymon.h"
-#elif R36S || R36S_SDL12COMPAT
+#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT)
 #include "keymon.h"
 #endif
 
@@ -429,8 +426,6 @@ static int high_res = 0;
 static int initial_width = 320;
 static int initial_height = 240;
 
-static int log_to_tmp_file = 0;
-
 ssize_t xwrite(int fd, char *s, size_t len)
 {
 	size_t aux = len;
@@ -589,22 +584,16 @@ void sdlinit(void)
 	xw.w = initial_width;
 	xw.h = initial_height;
 
-#ifdef RG35XXPLUS
+#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
 	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
 	{
-#elif R36S
-	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
-	{
-#elif MIYOOMINI
+#elif defined(MIYOOMINI)
 	if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE)))
 	{
-#elif TRIMUISMART
+#elif defined(TRIMUISMART)
 	setenv("SDL_USE_PAN", "true", 1); // allow DOUBLEBUF
 	if (!(screen = SDL_SetVideoMode(240, 320, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
-	{ // rotated LCD
-#elif UPSCALE || R36S_SDL12COMPAT
-	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
-	{
+	{ 
 #else
 	if (!(screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
 	{
@@ -699,7 +688,7 @@ void upscale2x(uint32_t *restrict src, uint32_t *restrict dst)
 		}
 	}
 }
-#elif MIYOOMINI
+#elif defined(MIYOOMINI)
 //	upscale 320x240x16 -> 640x480x32 with rotate180
 void upscale_and_rotate(uint32_t *restrict src, uint32_t *restrict dst)
 {
@@ -732,7 +721,7 @@ void upscale_and_rotate(uint32_t *restrict src, uint32_t *restrict dst)
 		}
 	}
 }
-#elif TRIMUISMART
+#elif defined(TRIMUISMART)
 //	320x240 -> 240x320 rotate90 CCW
 //	AB    BD
 //	CD -> AC
@@ -754,7 +743,7 @@ void rotate320x240_rw32(void *__restrict src, void *__restrict dst)
 		}
 	}
 }
-#elif UPSCALE || R36S_SDL12COMPAT
+#elif defined(UPSCALE) || defined(R36S_SDL12COMPAT)
 // upscale 320x240x16 -> 640x480x16
 void upscale(uint32_t *restrict src, uint32_t *restrict dst)
 {
@@ -800,13 +789,11 @@ void xflip(void)
 	else
 		memcpy(screen2->pixels, xw.win->pixels, 320 * 240 * 2);
 	draw_keyboard(screen2); // screen2(SW) = console + keyboard
-#ifdef RG35XXPLUS
+#if defined(RG35XXPLUS) || defined(R36S)
 	upscale2x(screen2->pixels, screen->pixels);
-#elif R36S
-	upscale2x(screen2->pixels, screen->pixels);
-#elif MIYOOMINI
+#elif defined(MIYOOMINI)
 	upscale_and_rotate(screen2->pixels, screen->pixels);
-#elif UPSCALE | R36S_SDL12COMPAT
+#elif defined(UPSCALE) || defined(R36S_SDL12COMPAT)
 	upscale(screen2->pixels, screen->pixels);
 #else
 	rotate320x240_rw32(screen2->pixels, screen->pixels);
@@ -3223,20 +3210,14 @@ void cresize(int width, int height)
 	row = (xw.h - 2 * borderpx) / xw.ch;
 
 	printf("set videomode %dx%d\n", xw.w, xw.h);
-#ifdef RG35XXPLUS
+#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
 	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
 	{
-#elif R36S
-	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
-	{
-#elif MIYOOMINI
+#elif defined(MIYOOMINI)
 	if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE)))
 	{
-#elif TRIMUISMART
+#elif defined(TRIMUISMART)
 	if (!(screen = SDL_SetVideoMode(240, 320, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
-	{
-#elif UPSCALE || R36S_SDL12COMPAT
-	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
 	{
 #else
 	if (!(screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
@@ -3331,35 +3312,10 @@ void run(void)
 	}
 #endif
 
-	queue_t qid = queue_create();
 	SDL_Event ev;
 
 	while (SDL_WaitEvent(&ev))
 	{
-
-		/* check for preload library wanting a sdl shutdown */
-		if (queue_peek(qid, MSG_CLIENT))
-		{
-			message_t message;
-			queue_read(qid, MSG_CLIENT, &message);
-			fprintf(stderr, "msg: %ld %ld\n", message.type, message.data);
-			if (message.data == MSG_REQUEST_SHUTDOWN)
-			{
-				message.type = MSG_SERVER;
-				message.data = MSG_SHUTDOWN;
-				queue_send(qid, &message);
-				sdlshutdown();
-				while (queue_read(qid, MSG_CLIENT, &message))
-				{
-					if (message.data == MSG_REQUEST_INIT)
-					{
-						sdlinit();
-						break;
-					}
-				}
-			}
-		}
-
 		if (ev.type == SDL_QUIT)
 			break;
 
@@ -3368,14 +3324,15 @@ void run(void)
 			int keyboard_event = handle_keyboard_event(&ev);
 			if (keyboard_event == -1)
 			{
+				// SDL_QUIT
 				break;
 			}
 			else if (keyboard_event == 1)
 			{
 #ifdef R36S_SDL12COMPAT
 				// FIXME: remove these 2 draw(). this is a hack to prevent the keyboard from being stuck
-				draw();
-				draw();
+				xflip();
+				xflip();
 #endif
 				/*SDL_Event expose_event = {
 					.type = SDL_VIDEOEXPOSE
@@ -3402,18 +3359,6 @@ void run(void)
 			draw();
 		}
 		xflip();
-
-		if (log_to_tmp_file)
-		{
-			fflush(stdout);
-			sync(); // flush log
-		}
-	}
-
-	if (log_to_tmp_file)
-	{
-		fflush(stdout);
-		sync(); // flush log
 	}
 
 	sdlshutdown();
@@ -3422,18 +3367,6 @@ void run(void)
 int main(int argc, char *argv[])
 {
 	setenv("SDL_NOMOUSE", "1", 1);
-
-	char *log_to_tmp_file_env = getenv("LOG_TO_TMP_FILE");
-	if (log_to_tmp_file_env)
-	{
-		log_to_tmp_file = 1;
-		int fd = open("/tmp/SimpleTerminal.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		dup2(fd, 1); // redirect stdout to log file
-		dup2(fd, 2); // redirect stderr to log file
-		printf("Starting up\n");
-		fflush(stdout);
-		sync(); // flush log
-	}
 
 	int i;
 

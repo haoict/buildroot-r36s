@@ -455,16 +455,12 @@ int compute_new_col(int visual_offset, int old_row, int new_row)
 
 int handle_keyboard_event(SDL_Event *event)
 {
+	// printf("handle_keyboard_event: sym: %d, scancode:%d\n",event->key.keysym.sym, event->key.keysym.scancode);
 #if defined(R36S) || defined(R36S_SDL12COMPAT)
 	// TODO: some keys are regconiized as "`" key. Temporary disable it.
 	if (event->key.keysym.sym == SDLK_BACKQUOTE)
 	{
 		return 1;
-	}
-	if (event->key.keysym.sym == 0 || event->key.keysym.sym == 1 || event->key.keysym.sym == 3 || event->key.keysym.sym == 4)
-	{
-		// ignore joystick events
-		return 0;
 	}
 #endif
 
