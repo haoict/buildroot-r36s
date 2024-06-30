@@ -7,8 +7,9 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-#define MAX_COMMAND_LENGTH 256
-#define MAX_NAME_LENGTH 256
+#define MAX_BUFFER_SIZE 512
+#define MAX_COMMAND_LENGTH MAX_BUFFER_SIZE
+#define MAX_NAME_LENGTH 128
 
 #define VERSION "1.0.0"
 
@@ -67,15 +68,15 @@ struct Command {
 
 Command *commands = NULL;
 int numCommands = 0;
-char title[MAX_NAME_LENGTH];
+char title[MAX_BUFFER_SIZE];
 char batteryCapacity[8];
 char batteryCapacityDisplayString[20] = "Batt: 0%";
 char brightness[8];
 char brightnessDisplayString[20] = "Brightness: 0%";
 char volume[8];
 char volumeDisplayString[20] = "Volume: 0%";
-char creditDisplayString[MAX_NAME_LENGTH];
-char pagesDisplayString[MAX_NAME_LENGTH];
+char creditDisplayString[MAX_BUFFER_SIZE];
+char pagesDisplayString[MAX_BUFFER_SIZE];
 
 void loadCommands(const char *filename)
 {
@@ -85,7 +86,7 @@ void loadCommands(const char *filename)
 		return;
 	}
 
-	char line[MAX_COMMAND_LENGTH];
+	char line[MAX_BUFFER_SIZE];
 
 	if (fgets(title, sizeof(title), file) == NULL) {
 		printf("Could not read title\n");
@@ -99,6 +100,7 @@ void loadCommands(const char *filename)
 		if (len > 0 && line[len - 1] == '\n') {
 			line[len - 1] = '\0';
 		}
+		// Skip empty line
 		if (line[0] == '\0') {
 			continue;
 		}
@@ -120,15 +122,27 @@ void loadCommands(const char *filename)
 			return;
 		}
 
-		// Remove trailing newline
-		len = strlen(line);
-		if (len > 0 && line[len - 1] == '\n') {
-			line[len - 1] = '\0';
-		}
+		// Check line overflow
+		if (strchr(line, '\n') == NULL) {
+			perror("Line is too long (max 512 chars). Skip this command\n");
+			strcpy(commands[numCommands].command,
+			       "echo 'Line is too long (max 512 chars). Skip this command' >> /dev/tty1 && sleep 2");
+			// If the buffer doesn't contain a newline character, read and discard remaining characters
+			int ch;
+			while ((ch = fgetc(file)) != '\n' && ch != EOF) {
+				// Do nothing, just discard the character
+			}
+		} else {
+			// Remove trailing newline
+			len = strlen(line);
+			if (len > 0 && line[len - 1] == '\n') {
+				line[len - 1] = '\0';
+			}
 
-		// Copy command
-		strncpy(commands[numCommands].command, line, MAX_COMMAND_LENGTH - 1);
-		commands[numCommands].command[MAX_COMMAND_LENGTH - 1] = '\0';
+			// Copy command
+			strncpy(commands[numCommands].command, line, MAX_COMMAND_LENGTH - 1);
+			commands[numCommands].command[MAX_COMMAND_LENGTH - 1] = '\0';
+		}
 
 		numCommands++;
 	}
