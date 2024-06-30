@@ -72,6 +72,22 @@ rm -rf output/target && find output/ -name ".stamp_target_installed" -delete && 
 ```
 
 ## Appendix
+### Make /roms.tar for firstboot
+```bash
+# Extract
+cd board/r36s/
+rm -rf roms_tar_xz
+mkdir -p roms_tar_xz
+tar -xvf rootfs_overlay_systemd/roms.tar.xz -C roms_tar_xz
+
+# Add/remove files in roms_tar as you want
+
+# Make .tar file
+cd roms_tar_xz
+tar -Jcvf ../rootfs_overlay_systemd/roms.tar.xz .
+cd ..
+```
+
 ### Run Docker
 ```bash
 wget https://download.docker.com/linux/static/stable/aarch64/docker-26.1.4.tgz
@@ -82,3 +98,4 @@ docker run -p 8080:80 -d --name hello --rm nginxdemos/hello
 docker ps -a
 curl localhost:8080
 ```
+

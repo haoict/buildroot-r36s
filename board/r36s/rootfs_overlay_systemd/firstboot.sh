@@ -15,8 +15,8 @@ echo "/dev/mmcblk0p3 /roms exfat umask=0000,iocharset=utf8,noatime 0 0" >> /etc/
 mount | grep /roms
 
 # Popluating /roms
-tar -xvf /roms.tar -C /roms >> /dev/tty1 2>&1
+tar -Jxvf /roms.tar.xz -C /roms >> /dev/tty1 2>&1
 
 # Cleanup
 mv /firstboot.sh /root/.firstboot-done.sh
-rm /roms.tar
+rm /roms.tar.xz
