@@ -68,7 +68,7 @@ async def handle_event(device):
                         #runcmd("if pidof simple-launcher > /dev/null; then killall simple-launcher; else cd /usr/local/bin && (LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/simple-launcher &); fi \n", shell=True)
                         runcmd("systemctl restart simple-init\n", shell=True)
                 if event.code == Joypad.start and event.value == 1:
-                    runcmd("killall emulationstation; killall retroarch; killall pico8_64; killall 351Files; true\n", shell=True)
+                    runcmd("killall retroarch; killall pico8_64; killall 351Files; true\n", shell=True)
                 if event.code == Joypad.up and event.value == 1:
                     brightness(1)
                 if event.code == Joypad.down and event.value == 1:

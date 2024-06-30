@@ -72,20 +72,21 @@ rm -rf output/target && find output/ -name ".stamp_target_installed" -delete && 
 ```
 
 ## Appendix
-### Make /roms.tar for firstboot
+### Make /roms.tar.xz for firstboot
 ```bash
 # Extract
 cd board/r36s/
 rm -rf roms_tar_xz
 mkdir -p roms_tar_xz
 tar -xvf rootfs_overlay_systemd/roms.tar.xz -C roms_tar_xz
+cd ../..
 
 # Add/remove files in roms_tar as you want
 
 # Make .tar file
-cd roms_tar_xz
+cd board/r36s/roms_tar_xz
 tar -Jcvf ../rootfs_overlay_systemd/roms.tar.xz .
-cd ..
+cd ../../..
 ```
 
 ### Run Docker
