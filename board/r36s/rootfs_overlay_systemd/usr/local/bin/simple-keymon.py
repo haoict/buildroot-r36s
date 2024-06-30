@@ -63,9 +63,10 @@ async def handle_event(device):
         if device.name == "GO-Super Gamepad":
             keys = joypadInput.active_keys()
             if Joypad.fn in keys:
-                if event.code == Joypad.select and event.value == 1:
-                    #runcmd("if pidof simple-launcher > /dev/null; then killall simple-launcher; else cd /usr/local/bin && (LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/simple-launcher &); fi \n", shell=True)
-                    runcmd("systemctl restart simple-init\n", shell=True)
+                if Joypad.select in keys:
+                    if event.code == Joypad.start and event.value == 1:
+                        #runcmd("if pidof simple-launcher > /dev/null; then killall simple-launcher; else cd /usr/local/bin && (LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/simple-launcher &); fi \n", shell=True)
+                        runcmd("systemctl restart simple-init\n", shell=True)
                 if event.code == Joypad.start and event.value == 1:
                     runcmd("killall emulationstation; killall retroarch; killall pico8_64; killall 351Files; true\n", shell=True)
                 if event.code == Joypad.up and event.value == 1:
