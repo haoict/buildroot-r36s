@@ -27,6 +27,24 @@
 #define VOLUME_COMMAND "amixer get 'digital volume' | awk -F'[][]' '/Mono:/ { print $2 }'"
 
 #define CREDIT "Simple Launcher " VERSION " (RG35) | "
+
+
+#elif defined(TRIMUISP)
+// TRIMUISP: A:0, B:1, X:2, Y:3, L1:4, R1:5, L2:9, R2:10, Select:6, Start:7, Fn:8/11, Up Down Left Right: SDL_JOYHATMOTION
+#define BTN_A 1
+#define BTN_B 0
+#define BTN_UP 4 // use L1 because UP is SDL_JOYHATMOTION
+#define BTN_DOWN 5 // use R1 because DOWN is SDL_JOYHATMOTION
+#define BTN_LEFT 9
+#define BTN_RIGHT 10
+
+#define BATTERY_CAPACITY_FILE "/sys/class/power_supply/axp2202-battery/capacity"
+#define BRIGHTNESS_FILE "/sys/devices/platform/backlight/backlight/backlight/brightness" // TODO: find correct path
+#define VOLUME_COMMAND "amixer get 'digital volume' | awk -F'[][]' '/Mono:/ { print $2 }'"
+
+#define CREDIT "Simple Launcher " VERSION " (TRIMUISP) | "
+
+
 #else
 // R36S:  Up:8, Down:9, Left:10, Right:11, A:1, B:0, X:2, Y:3, L1:4, R1:5, L2:6, R2:7, L3:14, R3:15, Select:12, Start:13, Fn:16
 #define BTN_A 1
@@ -42,6 +60,7 @@
 
 #define CREDIT "Simple Launcher " VERSION " (R36S) | "
 #endif
+
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -272,6 +291,9 @@ void executeShellScript(const char *script)
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	joystick = SDL_JoystickOpen(0);
+#if defined(TRIMUISP)
+    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+#endif
 }
 
 int main(int argc, char *argv[])
@@ -304,6 +326,9 @@ int main(int argc, char *argv[])
 	strcat(commandFilePath, COMMANDS_FILE);
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
+#if defined(TRIMUISP)
+    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+#endif
 	xsFont = TTF_OpenFont(fontPath, 16);
 	sFont = TTF_OpenFont(fontPath, 20);
 	mFont = TTF_OpenFont(fontPath, 24);
@@ -408,7 +433,7 @@ int main(int argc, char *argv[])
 				}
 				break;
 			*/
-#if defined(RG35XXP)
+#if defined(RG35XXP) || defined(TRIMUISP)
 			case SDL_JOYHATMOTION:
 				if (event.jhat.value == SDL_HAT_UP) {
 					if (selectedItem > 0)

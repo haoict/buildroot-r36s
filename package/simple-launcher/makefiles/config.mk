@@ -1,0 +1,5 @@
+CROSS_COMPILE = 
+CC = ${CROSS_COMPILE}gcc
+
+CFLAGS += 
+LDFLAGS += -lSDL2 -lSDL2_ttf

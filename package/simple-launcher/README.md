@@ -36,7 +36,15 @@ sudo sed -i 's|"$esdir/emulationstation" "$@"|/home/ark/simple-launcher.elf|g' /
 sudo systemctl restart emulationstation
 ```
 
-## Compile for RG35XXP
+## Cross compliation arm64
+### R36S or Trimui smart pro
+
+```bash
+UNION_PLATFORM=r36s make
+UNION_PLATFORM=trimuisp make
+```
+
+### Compile for RG35XXP
 ```bash
 cd /mnt/mmc/Roms/APPS
 gcc -o simple-launcher.elf simple-launcher.c -lSDL2 -lSDL2_ttf -DRG35XXP
