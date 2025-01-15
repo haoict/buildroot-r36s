@@ -16,6 +16,7 @@ To build and use the buildroot stuff, do the following:
 4) run 'make -j$(nproc)'
 5) wait while it compiles
 6) find the kernel, bootloader, root filesystem, etc. in output/images
+7) run post-build.sh to make flashable img file (instruction below)
 
 You do not need to be root to build or run buildroot.  Have fun!
 
@@ -52,6 +53,8 @@ Ref about parted command: https://raspberrypi.stackexchange.com/questions/78466/
 
 
 ```bash
+sudo apt-get install partred dosfstools
+
 cd board/r36s
 sudo ./post-build.sh
 ```
