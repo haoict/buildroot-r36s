@@ -1,7 +1,7 @@
 Simple Launcher
 Retroarch
 /usr/local/bin/cpu-performace.sh && LD_LIBRARY_PATH=/usr/local/lib HOME=/root /root/retroarch/retroarch && /usr/local/bin/cpu-powersave.sh
-Pico-8
+Pico-8 (native)
 if [ ! -e "/roms/pico-8/pico8_64" ] || [ ! -e "/roms/pico-8/pico8_64" ]; then echo "Put pico8_64 and pico8.dat to /roms/pico-8/ to run native pico8" >> /dev/tty1; sleep 5; else /usr/local/bin/cpu-performace.sh && LD_LIBRARY_PATH=/usr/local/lib /roms/pico-8/pico8_64 -splore -home /roms/pico-8  && /usr/local/bin/cpu-powersave.sh; fi
 Emulation Station
 LD_LIBRARY_PATH=/usr/local/lib HOME=/root /root/es/emulationstation
@@ -9,6 +9,8 @@ File Manager
 cd /root/351Files && LD_LIBRARY_PATH=/usr/local/lib /root/351Files/351Files
 Simple Terminal
 LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/SimpleTerminal
+Wifi (plug a wifi dongle first)
+/usr/local/bin/Wifi.sh
 Quit launcher
 killall simple-launcher && echo "Press Fn + Select + Start to restart Simple Launcher" >> /dev/tty1
 Sleep
