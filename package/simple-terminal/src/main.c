@@ -29,7 +29,7 @@
 #include "font.h"
 #include "keyboard.h"
 
-#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT)
+#if defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP)
 #include "keymon.h"
 #endif
 
@@ -283,7 +283,7 @@ static void xzoom(const Arg *);
 #include "config.h"
 
 SDL_Surface *screen;
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 SDL_Surface *screen2;
 #endif
 char preload_libname[PATH_MAX + 17];
@@ -469,8 +469,6 @@ void *xcalloc(size_t nmemb, size_t size)
 	return p;
 }
 
-
-
 SDL_Thread *thread = NULL;
 
 void sdlloadfonts(char *fontstr, int fontsize)
@@ -520,7 +518,7 @@ void sdlshutdown(void)
 			SDL_KillThread(thread);
 		if (xw.win)
 			SDL_FreeSurface(xw.win);
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 		if (screen2)
 			SDL_FreeSurface(screen2);
 #endif
@@ -544,6 +542,7 @@ void sdlinit(void)
 
 	fprintf(stderr, "SDL font\n");
 	SDL_EnableUNICODE(1);
+	SDL_ShowCursor(0);
 
 	/*if(TTF_Init() == -1) {
 		printf("TTF_Init: %s\n", TTF_GetError());
@@ -584,8 +583,11 @@ void sdlinit(void)
 	xw.w = initial_width;
 	xw.h = initial_height;
 
-#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
 	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
+	{
+#elif defined(TRIMUISP)
+	if (!(screen = SDL_SetVideoMode(1280, 720, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
 	{
 #elif defined(MIYOOMINI)
 	if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE)))
@@ -593,7 +595,7 @@ void sdlinit(void)
 #elif defined(TRIMUISMART)
 	setenv("SDL_USE_PAN", "true", 1); // allow DOUBLEBUF
 	if (!(screen = SDL_SetVideoMode(240, 320, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
-	{ 
+	{
 #else
 	if (!(screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
 	{
@@ -601,7 +603,7 @@ void sdlinit(void)
 		fprintf(stderr, "Unable to set video mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 	xw.win = SDL_CreateRGBSurface(SDL_SWSURFACE, xw.w, xw.h, 16, 0xF800, 0x7E0, 0x1F, 0);  // console screen
 	screen2 = SDL_CreateRGBSurface(SDL_SWSURFACE, xw.w, xw.h, 16, 0xF800, 0x7E0, 0x1F, 0); // for keyboardMix
 #else
@@ -628,8 +630,7 @@ void sdlinit(void)
 	SDL_PushEvent(&event);
 }
 
-
-#if defined(RG35XXPLUS) || defined(R36S)
+#if defined(RG35XXPLUS)
 // upscale 320x240x16 -> 640x480x32
 void upscale2x(uint32_t *restrict src, uint32_t *restrict dst)
 {
@@ -776,6 +777,44 @@ void upscale(uint32_t *restrict src, uint32_t *restrict dst)
 		}
 	}
 }
+#elif defined(TRIMUISP)
+// upscale 320x240x16 -> 1280x720x16
+void upscale4x3(uint32_t *restrict src, uint32_t *restrict dst)
+{
+	uint32_t x, y, pix, dpix1, dpix2;
+	if (high_res)
+	{
+		for (y = 480; y > 0; y--)
+		{
+			for (x = 640 / 2; x > 0; x--)
+			{
+				pix = *src++;
+				*dst++ = (pix & 0x0000FFFF) | (pix << 16);
+				*dst++ = (pix & 0xFFFF0000) | (pix >> 16);
+			}
+		}
+	}
+	else
+	{
+		for (y = 240; y > 0; y--, dst += 1280)
+		{
+			for (x = 320 / 2; x > 0; x--, dst += 4)
+			{
+				pix = *src++;
+				dpix1 = (pix & 0x0000FFFF) | (pix << 16);
+				dpix2 = (pix & 0xFFFF0000) | (pix >> 16);
+				dst[0] = dpix1;
+				dst[1] = dpix1;
+				dst[2] = dpix2;
+				dst[3] = dpix2;
+				dst[1280] = dpix1;
+				dst[1281] = dpix1;
+				dst[1282] = dpix2;
+				dst[1283] = dpix2;
+			}
+		}
+	}
+}
 #endif
 
 void xflip(void)
@@ -783,14 +822,16 @@ void xflip(void)
 	if (xw.win == NULL)
 		return;
 		// printf("flip\n");
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 	if (high_res)
 		memcpy(screen2->pixels, xw.win->pixels, 640 * 480 * 2); // copy for keyboardMix
 	else
 		memcpy(screen2->pixels, xw.win->pixels, 320 * 240 * 2);
 	draw_keyboard(screen2); // screen2(SW) = console + keyboard
-#if defined(RG35XXPLUS) || defined(R36S)
+#if defined(RG35XXPLUS)
 	upscale2x(screen2->pixels, screen->pixels);
+#elif defined(TRIMUISP)
+	upscale4x3(screen2->pixels, screen->pixels);
 #elif defined(MIYOOMINI)
 	upscale_and_rotate(screen2->pixels, screen->pixels);
 #elif defined(UPSCALE) || defined(R36S_SDL12COMPAT)
@@ -1374,8 +1415,10 @@ void execsh(void)
 	setenv("PS1", "\\[\\033[32m\\]\\W\\[\\033[00m\\]\\$ ", 1);
 	setenv("LANG", "", 1);
 
-	system("uname -a");
-	system("echo '\n'");
+	if (show_help != 0) {
+		system("uname -a");
+		system("echo '\n'");
+	}
 
 #if 0
 	snprintf(buf, sizeof(buf), "%lu", xw.win);
@@ -1394,7 +1437,8 @@ void execsh(void)
 	args = (char *[]){envshell, "-i", NULL};
 
 	// executing opt_cmd
-	for (int i = 0; i < opt_cmd_size; i++) {
+	for (int i = 0; i < opt_cmd_size; i++)
+	{
 		char echo_cmd[255];
 		sprintf(echo_cmd, "echo '\n$ %s\n'", opt_cmd[i]);
 		system(echo_cmd);
@@ -3210,8 +3254,11 @@ void cresize(int width, int height)
 	row = (xw.h - 2 * borderpx) / xw.ch;
 
 	printf("set videomode %dx%d\n", xw.w, xw.h);
-#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
 	if (!(screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE)))
+	{
+#elif defined(TRIMUISP)
+	if (!(screen = SDL_SetVideoMode(1280, 720, 16, SDL_HWSURFACE | SDL_DOUBLEBUF)))
 	{
 #elif defined(MIYOOMINI)
 	if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE)))
@@ -3228,7 +3275,7 @@ void cresize(int width, int height)
 	}
 	if (xw.win)
 		SDL_FreeSurface(xw.win);
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 	xw.win = SDL_CreateRGBSurface(SDL_SWSURFACE, xw.w, xw.h, 16, 0xF800, 0x7E0, 0x1F, 0); // console screen
 	if (screen2)
 		SDL_FreeSurface(screen2);
@@ -3304,7 +3351,7 @@ int ttythread(void *unused)
 
 void run(void)
 {
-#if defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT)
+#if defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP)
 	int res = open_adc_bnt_input();
 	if (res != 0)
 	{
@@ -3373,7 +3420,7 @@ int main(int argc, char *argv[])
 	xw.fw = xw.fh = xw.fx = xw.fy = 0;
 	xw.isfixed = false;
 
-#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S) || defined(R36S_SDL12COMPAT) || defined(UPSCALE)
+#if defined(MIYOOMINI) || defined(TRIMUISMART) || defined(RG35XXPLUS) || defined(R36S_SDL12COMPAT) || defined(TRIMUISP) || defined(UPSCALE)
 	char *high_res_env = getenv("HIGH_RES");
 	if (high_res_env)
 	{
@@ -3394,13 +3441,27 @@ int main(int argc, char *argv[])
 			if (++i < argc)
 				opt_class = argv[i];
 			break;
-		case 'e':
-			/* eat every remaining arguments */
+		case 'd':
+			/* run commands from arguments with on screen keyboard */
 			if (++i < argc)
 			{
 				opt_cmd = &argv[i];
 				opt_cmd_size = argc - 2;
-				for(int j = 0; j < opt_cmd_size; j++)
+				for (int j = 0; j < opt_cmd_size; j++)
+				{
+					printf("Command to execute: %s\n", opt_cmd[j]);
+				}
+				show_help = 0;
+				active = 1;
+			}
+			goto run;
+		case 'e':
+			/* run commands from arguments without on screen keyboard */
+			if (++i < argc)
+			{
+				opt_cmd = &argv[i];
+				opt_cmd_size = argc - 2;
+				for (int j = 0; j < opt_cmd_size; j++)
 				{
 					printf("Command to execute: %s\n", opt_cmd[j]);
 				}

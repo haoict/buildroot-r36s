@@ -80,8 +80,10 @@ void open_gpio_keys_polled()
 				{
 #if defined(RG35XXPLUS)
 					if (!strcmp(v6, "Deeplay-keys") || !strcmp(v6, "ANBERNIC-keys"))
-#elif defined(R36S) || defined(R36S_SDL12COMPAT)
+#elif defined(R36S_SDL12COMPAT)
 					if (!strcmp(v6, "GO-Super Gamepad"))
+#elif defined(TRIMUISP)
+					if (!strcmp(v6, "TRIMUI Player1"))
 #endif
 					{
 						printf("open_gpio_keys_polled success: /dev/input/%s\n", d_name);
@@ -140,7 +142,7 @@ void process_events(int ev_code, int ev_value)
 			sym = RAW_RIGHT;
 		}
 	}
-#if defined(R36S) || defined(R36S_SDL12COMPAT)
+#if defined(R36S_SDL12COMPAT)
 	// ignore joysticks
 	else if (ev_code == 0 || ev_code == 1 || ev_code == 3 || ev_code == 4)
 	{
@@ -268,7 +270,7 @@ int open_adc_bnt_input()
 	open_gpio_keys_polled();
 	if (gpio_keys_polled_fd <= 0)
 	{
-		printf("open_gpio_keys_polled error\n");  // rg35xxplus: /dev/input/event1, r36s: /dev/input/event2
+		printf("open_gpio_keys_polled error\n");  // rg35xxplus: /dev/input/event1, r36s: /dev/input/event2, trimuisp: /dev/input/event2
 		return -1;
 	}
 	event_0_fd = open("/dev/input/event0", 0);

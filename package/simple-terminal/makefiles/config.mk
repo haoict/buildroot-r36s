@@ -6,7 +6,7 @@
 # st version
 #GIT_SHA_FETCH := $(shell git rev-parse HEAD | cut -c 1-7)
 #VERSION = "1.0.2-$(shell git rev-parse HEAD | cut -c 1-7)"
-VERSION = "1.3.0"
+VERSION = "1.5.0"
 
 # Customize below to fit your system
 
